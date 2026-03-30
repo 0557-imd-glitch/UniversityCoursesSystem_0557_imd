@@ -1,0 +1,99 @@
+@model IEnumerable<UniversityCourseManager.Models.Course>
+
+@{
+    ViewData["Title"] = "Дисциплини";
+    var enrolledIds = ViewBag.EnrolledIds as List<int> ?? new List<int>();
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="mb-1">Дисциплини</h1>
+        <p class="text-muted mb-0">
+            Преглед на всички учебни дисциплини и тяхната принадлежност към специалности.
+        </p>
+    </div>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="btn btn-warning text-white">
+            + Добави дисциплина
+        </a>
+    }
+</div>
+
+<div class="courses-table-wrap">
+    <table class="table courses-table align-middle">
+        <thead>
+            <tr>
+                <th>Име</th>
+                <th>Преподавател</th>
+                <th class="text-center">Кредити</th>
+                <th>Специалности</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        @foreach (var item in Model.OrderBy(c => c.Name))
+        {
+            <tr>
+                <td>
+                    <span class="course-name">@item.Name</span>
+                </td>
+
+                <td>
+                    @item.Lecturer
+                </td>
+
+                <td class="text-center">
+                    <span class="credits-line">@item.Credits</span>
+                </td>
+
+                <td>
+                    @foreach (var cs in item.CourseSpecialties)
+                    {
+                        <a asp-controller="Specialties"
+                           asp-action="Details"
+                           asp-route-id="@cs.Specialty!.Id"
+                           class="badge specialty-badge specialty-link">
+                            @cs.Specialty.Name
+                        </a>
+                    }
+                </td>
+
+                <td>
+                    <div class="action-stack">
+
+                        <a asp-action="Details"
+                           asp-route-id="@item.Id"
+                           class="btn btn-outline-secondary btn-sm">
+                            Детайли
+                        </a>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit"
+                               asp-route-id="@item.Id"
+                               class="btn btn-warning btn-sm text-white">
+                                Редакция
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@item.Id"
+                               class="btn btn-danger btn-sm">
+                                Изтрий
+                            </a>
+                        }
+
+                        @if (User.IsInRole("Student") && enrolledIds.Contains(item.Id))
+                        {
+                            <span class="badge bg-success">Записан</span>
+                        }
+
+                    </div>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

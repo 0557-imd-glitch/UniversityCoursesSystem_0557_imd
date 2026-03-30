@@ -1,0 +1,104 @@
+@model IEnumerable<UniversityCourseManager.Models.Course>
+
+@{
+    ViewData["Title"] = "Записвания по дисциплини";
+
+    var studentCourses = ViewBag.StudentCourses as List<UniversityCourseManager.Models.StudentCourse>;
+    var studentEmails = ViewBag.StudentEmails as Dictionary<string, string>;
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="mb-1">Записвания по дисциплини</h1>
+        <p class="text-muted mb-0">
+            Преглед на дисциплините и студентите, които са записани в тях.
+        </p>
+    </div>
+</div>
+
+<div class="row g-4">
+
+@foreach (var course in Model)
+{
+    var enrollments = studentCourses?
+        .Where(sc => sc.CourseId == course.Id)
+        .ToList() ?? new List<UniversityCourseManager.Models.StudentCourse>();
+
+    <div class="col-md-6">
+
+        <div class="content-card h-100 d-flex flex-column p-4">
+
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+
+                <div>
+                    <h3 class="course-card-title mb-1">@course.Name</h3>
+
+                    <div class="course-lecturer">
+                        Преподавател: @course.Lecturer
+                    </div>
+                </div>
+
+                <span class="badge course-credit-badge">
+                    @course.Credits кр.
+                </span>
+
+            </div>
+
+            <div class="mb-3">
+                @foreach (var cs in course.CourseSpecialties)
+                {
+                    <span class="badge specialty-badge me-1 mb-1">
+                        @cs.Specialty?.Name
+                    </span>
+                }
+            </div>
+
+
+            <div class="enrollments-stat mb-3">
+
+                <span class="enrollments-label">
+                    Записани студенти
+                </span>
+
+                <span class="enrollments-count
+                    @(enrollments.Count == 0 ? "enrollments-zero"
+                      : enrollments.Count < 3 ? "enrollments-few"
+                      : "enrollments-many")">
+
+                    @enrollments.Count
+
+                </span>
+
+            </div>
+
+
+            @if (enrollments.Any())
+            {
+                <div class="list-group list-group-flush">
+
+                    @foreach (var e in enrollments)
+                    {
+                        var email = studentEmails != null && studentEmails.ContainsKey(e.StudentId)
+                            ? studentEmails[e.StudentId]
+                            : e.StudentId;
+
+                        <div class="list-group-item px-3 py-2 rounded mb-2 border bg-white">
+                            @email
+                        </div>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <div class="enrollment-empty-state mt-2">
+                    Няма записани студенти.
+                </div>
+            }
+
+        </div>
+
+    </div>
+}
+
+</div>

@@ -1,0 +1,130 @@
+@model UniversityCourseManager.Models.Course
+
+@{
+    ViewData["Title"] = "Детайли за дисциплина";
+    bool isEnrolled = ViewBag.IsEnrolled != null && (bool)ViewBag.IsEnrolled;
+    string? returnUrl = ViewBag.ReturnUrl as string;
+}
+
+<div class="mb-4">
+    <span class="section-badge">Дисциплина</span>
+    <h1 class="mt-2 mb-2">Детайли за дисциплина</h1>
+    <p class="text-muted mb-0">
+        Подробна информация за избраната учебна дисциплина.
+    </p>
+</div>
+
+<div class="content-card p-4 course-details-card">
+    <div class="course-details-header mb-4">
+        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+            <div>
+                <h2 class="course-details-title mb-2">@Model.Name</h2>
+                <div class="course-lecturer">
+                    Преподавател: @Model.Lecturer
+                </div>
+            </div>
+
+            <div class="course-credit-badge">
+                @Model.Credits кр.
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="detail-label">Име</div>
+        </div>
+        <div class="col-md-9">
+            <div class="detail-value">@Model.Name</div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="detail-label">Преподавател</div>
+        </div>
+        <div class="col-md-9">
+            <div class="detail-value">@Model.Lecturer</div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="detail-label">Кредити</div>
+        </div>
+        <div class="col-md-9">
+            <div class="detail-value">
+                <span class="credits-line">@Model.Credits</span>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="detail-label">Анотация</div>
+        </div>
+        <div class="col-md-9">
+            <div class="detail-value course-annotation">
+                @(string.IsNullOrWhiteSpace(Model.Annotation)
+                    ? "Няма въведена анотация за тази дисциплина."
+                    : Model.Annotation)
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="detail-label">Специалности</div>
+        </div>
+        <div class="col-md-9">
+            <div class="detail-value">
+                @foreach (var cs in Model.CourseSpecialties)
+                {
+                    <span class="badge specialty-badge">@cs.Specialty!.Name</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex flex-wrap gap-2">
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning text-white">
+                Редакция
+            </a>
+        }
+
+        @if (User.IsInRole("Student"))
+        {
+            if (isEnrolled)
+            {
+                <a asp-action="Unenroll"
+                   asp-route-id="@Model.Id"
+                   asp-route-returnUrl="@returnUrl"
+                   class="btn btn-danger">
+                    Отпиши се
+                </a>
+            }
+            else
+            {
+                <a asp-action="Enroll"
+                   asp-route-id="@Model.Id"
+                   asp-route-returnUrl="@returnUrl"
+                   class="btn btn-warning text-white">
+                    Запиши
+                </a>
+            }
+        }
+
+        @if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            <a href="@returnUrl" class="btn btn-outline-secondary">
+                Назад
+            </a>
+        }
+        else if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                Назад
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Specialties" asp-action="Index" class="btn btn-outline-secondary">
+                Назад
+            </a>
+        }
+    </div>
+</div>

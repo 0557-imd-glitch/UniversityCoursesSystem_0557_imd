@@ -1,0 +1,101 @@
+@model IEnumerable<UniversityCourseManager.Models.Course>
+
+@{
+    ViewData["Title"] = "Дисциплини по специалност";
+
+    var specialtyName = ViewBag.SpecialtyName as string ?? "";
+    var specialtyId = (int)(ViewBag.SpecialtyId ?? 0);
+    var requiredCredits = (int)(ViewBag.RequiredElectiveCredits ?? 0);
+    var remainingCredits = (int)(ViewBag.RemainingCredits ?? requiredCredits);
+    var hasEnoughCredits = (bool)(ViewBag.HasEnoughCredits ?? false);
+
+    var enrolledIds = ViewBag.EnrolledIds as List<int> ?? new List<int>();
+}
+
+<div class="mb-4">
+    <span class="section-badge">Специалност</span>
+
+    <h1 class="mt-2 mb-2">@specialtyName</h1>
+
+    <p class="text-muted mb-2">
+        Дисциплини, достъпни за записване към избраната специалност.
+    </p>
+
+    <div class="credits-status @(hasEnoughCredits ? "credits-ok" : "credits-missing")">
+        Оставащи избираеми кредити:
+        <span class="credits-current">@remainingCredits</span>
+        <span class="credits-separator">/</span>
+        <span class="credits-total">@requiredCredits</span>
+    </div>
+</div>
+
+@if (TempData["EnrollError"] != null)
+{
+    <div class="alert alert-danger mb-4" role="alert">
+        @TempData["EnrollError"]
+    </div>
+}
+
+<div class="row g-4">
+@foreach (var item in Model)
+{
+    bool isEnrolled = enrolledIds.Contains(item.Id);
+
+    <div class="col-md-6">
+        <div class="content-card h-100 d-flex flex-column p-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <h3 class="course-card-title mb-0">@item.Name</h3>
+
+                <span class="badge course-credit-badge">@item.Credits кр.</span>
+            </div>
+
+            <div class="course-lecturer mb-3">
+                Преподавател: @item.Lecturer
+            </div>
+
+            <p class="text-muted flex-grow-1 mb-4 course-annotation">
+                @(string.IsNullOrWhiteSpace(item.Annotation)
+                    ? "Няма въведена анотация за тази дисциплина."
+                    : item.Annotation)
+            </p>
+
+            <div class="d-flex flex-wrap gap-2 mt-auto">
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Courses"
+                       asp-action="Details"
+                       asp-route-id="@item.Id"
+                       asp-route-returnUrl="@Url.Action("Courses", "Specialties", new { id = specialtyId })"
+                       class="btn btn-outline-secondary btn-sm">
+                        Детайли
+                    </a>
+                }
+
+                @if (User.IsInRole("Student"))
+                {
+                    if (!isEnrolled)
+                    {
+                        <a asp-controller="Courses"
+                           asp-action="Enroll"
+                           asp-route-id="@item.Id"
+                           asp-route-returnUrl="@Url.Action("Courses", "Specialties", new { id = specialtyId })"
+                           class="btn btn-warning btn-sm text-white">
+                            Запиши
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Courses"
+                           asp-action="Unenroll"
+                           asp-route-id="@item.Id"
+                           asp-route-returnUrl="@Url.Action("Courses", "Specialties", new { id = specialtyId })"
+                           class="btn btn-danger btn-sm">
+                            Отпиши
+                        </a>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}
+</div>

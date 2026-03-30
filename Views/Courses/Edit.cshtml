@@ -1,0 +1,67 @@
+@model UniversityCourseManager.ViewModels.CourseFormViewModel
+
+@{
+    ViewData["Title"] = "Редакция на дисциплина";
+}
+
+<h1>Редакция на дисциплина</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Lecturer" class="form-label"></label>
+                <input asp-for="Lecturer" class="form-control" />
+                <span asp-validation-for="Lecturer" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Credits" class="form-label"></label>
+                <input asp-for="Credits" class="form-control" />
+                <span asp-validation-for="Credits" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Annotation" class="form-label"></label>
+                <textarea asp-for="Annotation" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Annotation" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="SelectedSpecialtyIds" class="form-label"></label>
+                <select asp-for="SelectedSpecialtyIds"
+                        asp-items="Model.AvailableSpecialties"
+                        class="form-select"
+                        multiple
+                        size="8">
+                </select>
+                <span asp-validation-for="SelectedSpecialtyIds" class="text-danger"></span>
+                <div class="form-text">
+                    Задръж Ctrl, за да избереш повече от една специалност.
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Запази</button>
+                <a asp-action="Index" class="btn btn-secondary">Назад</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

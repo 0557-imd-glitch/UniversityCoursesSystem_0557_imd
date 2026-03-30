@@ -1,0 +1,39 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    var currentPath = Context.Request.Path.Value?.ToLower();
+    var isAuthPage = currentPath != null &&
+        (currentPath.Contains("/identity/account/login") ||
+         currentPath.Contains("/identity/account/register"));
+}
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="user-panel">
+
+        <span class="hello-text">
+            Hello, <strong>@User.Identity?.Name</strong>!
+        </span>
+
+        <form asp-area="Identity"
+              asp-page="/Account/Logout"
+              asp-route-returnUrl="@Url.Action("Index", "Home")"
+              method="post"
+              class="logout-form">
+
+            <button type="submit" class="logout-badge">
+                Изход
+            </button>
+
+        </form>
+
+    </div>
+}
+else if (!isAuthPage)
+{
+    <a class="login-link" asp-area="Identity" asp-page="/Account/Login">
+        Вход
+    </a>
+}

@@ -1,0 +1,37 @@
+@model UniversityCourseManager.Models.Course
+
+@{
+    ViewData["Title"] = "Изтриване на дисциплина";
+}
+
+<h1>Изтриване на дисциплина</h1>
+
+<h3>Сигурен ли си, че искаш да изтриеш тази дисциплина?</h3>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Име</dt>
+        <dd class="col-sm-9">@Model.Name</dd>
+
+        <dt class="col-sm-3">Преподавател</dt>
+        <dd class="col-sm-9">@Model.Lecturer</dd>
+
+        <dt class="col-sm-3">Кредити</dt>
+        <dd class="col-sm-9">@Model.Credits</dd>
+
+        <dt class="col-sm-3">Анотация</dt>
+        <dd class="col-sm-9">@Model.Annotation</dd>
+
+        <dt class="col-sm-3">Специалности</dt>
+        <dd class="col-sm-9">
+            @string.Join(", ", Model.CourseSpecialties.Select(cs => cs.Specialty!.Name))
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Изтрий</button>
+        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+    </form>
+</div>

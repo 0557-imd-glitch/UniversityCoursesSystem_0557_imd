@@ -1,0 +1,78 @@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+    string NavClass(string controller, string action = "Index") =>
+        string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase)
+        && string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase)
+            ? "nav-link active"
+            : "nav-link";
+}
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - UniversityCourseManager</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="top-hero">
+        <div class="container py-3 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3 brand-wrap">
+                <img src="~/images/unibit-logo.png" alt="УниБИТ" class="brand-logo" />
+                <div class="brand-title">Университет по библиотекознание и информационни технологии</div>
+            </div>
+
+            <partial name="_LoginPartial" />
+        </div>
+    </header>
+
+    <nav class="navbar navbar-expand-lg navbar-dark app-navbar">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div id="mainNav" class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="@NavClass("Home")" asp-controller="Home" asp-action="Index">Начало</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="@NavClass("Specialties")" asp-controller="Specialties" asp-action="Index">Специалности</a>
+                    </li>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="@NavClass("Courses")" asp-controller="Courses" asp-action="Index">Дисциплини</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-shell">
+        <div class="container py-4">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <footer class="footer-bar">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+            <span>© @DateTime.Now.Year - UniversityCourseManager</span>
+            <span class="small">ASP.NET Core MVC • Identity • SQLite • Entity Framework</span>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
